@@ -34,6 +34,10 @@ let writer = createObjectCsvWriter({
     {
       id: 'designation',
       title: 'designation'
+    },
+    {
+      id: 'address',
+      title: 'physical address'
     }
   ]
 }) 
@@ -49,7 +53,15 @@ async.whilst(
       .then(response => {
         numParks = parseInt(response.data.total, 10)
         response.data.data.forEach((park:any) => { 
-          records.push(park)    
+          console.log("park entranceFees, " , park.entranceFees)
+          console.log("park addresses, " , park.addresses)
+          if(park.addresses && park.addresses.length) {
+            park.addresses.forEach((addy: any) => {
+              if (addy.type != 'Physical') return
+              park.address = `${addy.line1 || park.name}\n${addy.line2}\n${addy.city}, ${addy.stateCode} ${addy.postalCode}`
+            });
+          }
+          records.push(park)
         })
         callback()
       }).catch( error => {
